@@ -4,6 +4,8 @@ from time import sleep
 import pandas_ta as ta
 import numpy as np
 import time
+from binance.enums import *
+from binance.exceptions import BinanceAPIException, BinanceOrderException
 
 #init
 api_key = "ZWRaoWOTwGjOXplLWXI6tjSjApuNhbc57xWlMSNtr8mUuN2z9fHz1LHfuW8iQuUo"
@@ -13,7 +15,7 @@ client = Client(api_key, api_secret)
 
 client.API_URL = 'https://testnet.binance.vision/api'
 
-cryptoSymbol = 'BTCUSDT'
+cryptoSymbol = 'ETHUSDT'
 
 def fetchData():
 
@@ -123,25 +125,41 @@ def computeTechnicalIndicators(dataFrame):
     return rsiStatus
 
 def executeTrade():
-    dataFrame = fetchData()
-    rsi = computeTechnicalIndicators(dataFrame)
 
-    currentlyHolding = False
 
-    print(rsi)
+    while(1):
+        dataFrame = fetchData()
+        rsi = computeTechnicalIndicators(dataFrame)
 
-    if rsi == 'BUY' and not currentlyHolding:
-        print("Placing BUY order")
-        currentlyHolding = True
-    elif rsi == 'SELL' and currentlyHolding:
-        print("Placing SELL order")
-        currentlyHolding=False
-    time.sleep(5*60)
+        currentlyHolding = False
+
+        if rsi == 'BUY' and not currentlyHolding:
+            print("Placing BUY order")
+            currentlyHolding = True
+            try:
+                buy_limit = client.order_market_buy(symbol='ETHUSDT', quantity=100, price=2000)
+            except BinanceAPIException as e:
+                # error handling goes here
+                print(e)
+            except BinanceOrderException as e:
+                # error handling goes here
+                print(e)
+
+        elif rsi == 'SELL' and currentlyHolding:
+            print("Placing SELL order")
+            try:
+                market_order = client.order_market_sell(symbol='ETHUSDT', quantity=100)
+            except BinanceAPIException as e:
+                # error handling goes here
+                print(e)
+            except BinanceOrderException as e:
+                # error handling goes here
+                print(e)
+            currentlyHolding=False
+
+        time.sleep(60*5) #interval is 5 minutes
 
     return
 
 executeTrade()
-
-
-
 
