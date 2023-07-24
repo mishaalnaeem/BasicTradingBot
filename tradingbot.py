@@ -137,7 +137,7 @@ def executeTrade():
             print("Placing BUY order")
             currentlyHolding = True
             try:
-                buy_limit = client.order_market_buy(symbol='ETHUSDT', quantity=100, price=2000)
+                buy_limit = client.order_market_buy(symbol=cryptoSymbol, quantity=100, price=2000)
             except BinanceAPIException as e:
                 # error handling goes here
                 print(e)
@@ -148,7 +148,7 @@ def executeTrade():
         elif rsi == 'SELL' and currentlyHolding:
             print("Placing SELL order")
             try:
-                market_order = client.order_market_sell(symbol='ETHUSDT', quantity=100)
+                market_order = client.order_market_sell(symbol=cryptoSymbol, quantity=100)
             except BinanceAPIException as e:
                 # error handling goes here
                 print(e)
